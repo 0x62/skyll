@@ -1,0 +1,21 @@
+extends layout
+
+block content
+  .container
+    table.table
+      tr
+        th Attack Destination
+        th Commander
+        th Launch Successful
+        th Accuracy
+        th Defended By
+        th Hit Target
+        
+      each attack in attacks
+        tr
+          td= attack.country
+          td= attack.user
+          td= attack.success ? 'Yes' : 'No'
+          td= attack.accuracy
+          td= attack.defence.attemptBy
+          td= attack.defence.success ? 'No' : 'Yes'

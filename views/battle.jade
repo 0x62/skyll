@@ -1,0 +1,396 @@
+extends layout
+
+block content
+  style.
+    body {
+      background-color: #000;
+    }
+    
+    #map {
+      position: relative;
+      width: 100vw;
+      height: 80vh;
+      max-width:100%;
+      max-height:80%
+    }
+    
+    #stream {
+      height: 100px;
+      width: 80%;
+      overflow: scroll;
+      color: green;
+      font-family: 'Courier New', Courier, 'Lucida Sans Typewriter', 'Lucida Typewriter', monospace;
+      font-size: 1em;
+      line-height: 0.8em;
+    }
+    
+    .stats {
+      color: #fff;
+      border: 1px dashed rgba(255, 255, 255, 0.3);
+      padding: 10px;
+      opacity: 0.2;
+    }
+    
+    .stats:hover {
+      opacity: 0.5;
+    }
+    
+    .stats.active-stat {
+      opacity: 0.5;
+    }
+    
+    .stats .critical {
+      color: rgba(255, 0, 0, 1);
+    }
+    
+    .stats .warning {
+      color: rgba(255, 255, 0, 1);
+    }
+  
+  script(src="http://d3js.org/d3.v3.min.js")
+  script(src="http://d3js.org/d3.geo.projection.v0.min.js")
+  script(src="http://d3js.org/topojson.v1.min.js")
+  script(src="http://datamaps.github.io/scripts/datamaps.world.min.js?v=1")
+  script(src="http://code.jquery.com/jquery-2.1.1.min.js")
+  script(src="/socket.io/socket.io.js")
+  script(src="/js/lib/vex.combined.min.js")
+  script(src="/js/lib/guage.min.js")
+
+  #map
+  #stream
+  
+  script.
+  
+    vex.defaultOptions.className = 'vex-theme-wireframe';
+    
+    // setup default min/max timer range for random draw
+    attack_min = 100;
+    attack_max = 2000;
+
+    // here's where we deal with parameters
+    // try to grab them, see if they exist, make changes to defaults if they do
+
+    // we maintain a fixed queue of "attacks" via this class
+    function FixedQueue( size, initialValues ){
+      initialValues = (initialValues || []);
+      var queue = Array.apply( null, initialValues );
+      queue.fixedSize = size;
+      queue.push = FixedQueue.push;
+      queue.splice = FixedQueue.splice;
+      queue.unshift = FixedQueue.unshift;
+      FixedQueue.trimTail.call( queue );
+      return( queue );
+    }
+
+    FixedQueue.trimHead = function(){
+      if (this.length <= this.fixedSize){ return; }
+      Array.prototype.splice.call( this, 0, (this.length - this.fixedSize) );
+    };
+
+    FixedQueue.trimTail = function(){
+      if (this.length <= this.fixedSize) { return; }
+      Array.prototype.splice.call( this, this.fixedSize, (this.length - this.fixedSize)
+      );
+    };
+
+    FixedQueue.wrapMethod = function( methodName, trimMethod ){
+      var wrapper = function(){
+        var method = Array.prototype[ methodName ];
+        var result = method.apply( this, arguments );
+        trimMethod.call( this );
+        return( result );
+      };
+      return( wrapper );
+    };
+
+    FixedQueue.push = FixedQueue.wrapMethod( "push", FixedQueue.trimHead );
+    FixedQueue.splice = FixedQueue.wrapMethod( "splice", FixedQueue.trimTail );
+    FixedQueue.unshift = FixedQueue.wrapMethod( "unshift", FixedQueue.trimTail );
+
+    var rand = function(min, max) {
+        return Math.random() * (max - min) + min;
+    };
+    
+    var pendingLaunch;
+
+    var map = new Datamap({
+
+        scope: 'channel',
+        setProjection: function(element) {
+          var projection = d3.geo.equirectangular()
+            .center([-2.346006, 49.322553])
+            .scale(85000)
+            .translate([element.offsetWidth / 2, element.offsetHeight / 2]);
+          var path = d3.geo.path()
+            .projection(projection);
+
+          return {path: path, projection: projection};
+        },
+        element: document.getElementById('map'),
+        projection: 'mercator',
+
+        fills: {
+          defaultFill: 'black',
+          myCountry: 'rgba(0,128,0,0.3)'
+        },
+        
+        data: {
+          #{user.tribe.code}: { fillKey: 'myCountry' }
+        },
+
+        geographyConfig: {
+          dataUrl: '/map.json',
+          borderWidth: 2,
+          borderColor: '#4393c3',
+          popupOnHover: false,
+          highlightOnHover: true,
+          highlightFillColor: 'rgba(128, 0, 0, 0.6)',
+          highlightBorderColor: '#4393c3',
+          highlightBorderWidth: 2
+        },
+
+        done: function(datamap) {
+          // Add information boxes below gg and above je
+          
+          var gg = $('.datamaps-subunit.gg');
+          var je = $('.datamaps-subunit.je');
+          var sk = $('.datamaps-subunit.sk');
+          
+          var ggPos = gg.offset();
+          var ggHeight = gg[0].getBoundingClientRect().height;
+          var jePos = je.offset();
+          var skPos = sk.offset();
+          
+          $('body').append('<div class="stats gg-stats" style="position: absolute; left: ' + ggPos.left + 'px; top: ' + (ggPos.top + ggHeight + 30) + 'px;"><strong>Guernsey</strong><br>Infrastructure: 8.5<br>Tourism: <span class="critical">2.3</span><br>Military Power: <span class="warning">4.8</span></div>');
+          $('body').append('<div class="stats je-stats" style="position: absolute; left: ' + jePos.left + 'px; top: ' + (jePos.top - 130) + 'px;"><strong>Jersey</strong><br>Infrastructure: 9.2<br>Tourism: 7.3<br>Military Power: <span class="warning">3.5</span></div>');
+          $('body').append('<div class="stats sk-stats" style="position: absolute; left: ' + (skPos.left + 80) + 'px; top: ' + skPos.top + 'px;"><strong>Sark</strong></div>');
+          
+          
+          gg.on('mouseover', function(){
+            $('.gg-stats').addClass('active-stat');
+          }).on('mouseout', function(){
+            $('.gg-stats').removeClass('active-stat');
+          })
+          
+          je.on('mouseover', function(){
+            $('.je-stats').addClass('active-stat');
+          }).on('mouseout', function(){
+            $('.je-stats').removeClass('active-stat');
+          })
+          
+          sk.on('mouseover', function(){
+            $('.sk-stats').addClass('active-stat');
+          }).on('mouseout', function(){
+            $('.sk-stats').removeClass('active-stat');
+          })
+          
+          $('#stream').css('margin-left', ggPos.left + 'px');
+          
+          datamap.svg.selectAll('.datamaps-subunit').on('click', function(geography) {
+           
+            if (geography.properties.code == '#{user.tribe.code}') {
+              vex.dialog.buttons.YES.text = 'Oh, sorry';
+              vex.dialog.alert('You can\'t attack yourself');
+              return;
+            }
+            
+            if (!geography.properties.code) {
+              vex.dialog.buttons.YES.text = 'Oh, sorry';
+              vex.dialog.alert('Pick on someone your own size');
+              return;
+            };
+            
+            var value = 0;
+            var interval; 
+            
+            vex.dialog.open({
+              message: 'Click "Launch" to set accuracy...',
+              input: "<canvas id='power'></canvas>",
+              afterOpen: function(){
+                var opts = {
+                  lines: 12,
+                  angle:0.15,
+                  lineWidth: 0.44,
+                  pointer: {
+                    length: 0.82,
+                    strokeWidth: 0.035,
+                    color: '#fff'
+                  },
+                  limitMax: 'false',
+                  colorStart: '#00CF53',
+                  colorStop: '#00CF53',
+                  strokeColor: '#6E0016',
+                  generateGradient: true
+                };
+                
+                var target = document.getElementById('power');
+                var gauge = new Gauge(target).setOptions(opts);
+                gauge.maxValue = 3000;
+                gauge.animationSpeed = 1;
+              
+                var down = false;
+                
+                interval = setInterval(function(){
+                  if (value < 3000 && !down) {
+                    value += 50;
+                  } else if (value >= 3000 || down) {
+                    value -= 50;
+                    down = true;
+                    if (value <= 0) down = false;
+                  } 
+                  
+                  gauge.set(value);
+                }, 5);
+                
+              },
+              
+              buttons: {
+                YES: {
+                  text: 'Launch Attack',
+                  type: 'button',
+                  className: 'vex-dialog-button-primary',
+                  click: function($vexContent){
+                    socket.emit('attack', { country: geography.properties.code, name: geography.properties.name, accuracy: value });
+                    if ($vexContent.data()) vex.close($vexContent.data().vex.id);
+                    clearInterval(interval);
+                  }
+                }
+              }
+            });
+          });
+        }
+
+      })
+
+    // we read in a modified file of all country centers
+    var centers = {
+      'je': [
+        [49.181621, -2.100769],
+        [49.230175, -2.189629],
+        [49.217177, -2.075539],
+        [49.185124, -2.225229],
+        [49.173579, -2.044144],
+        [49.230175, -2.060963],
+        [49.238398, -2.156084],
+        [49.217717, -2.121679],
+        [49.198871, -2.070061]
+      ],
+      'gg': [
+        [49.456884, -2.541191],
+        [49.435099, -2.610261],
+        [49.485485, -2.554421],
+        [49.466438, -2.591568],
+        [49.447528, -2.596043],
+        [49.431813, -2.543008],
+        [49.431444, -2.657543],
+        [49.465716, -2.545124],
+        [49.489377, -2.525904],
+        [49.462083, -2.540283]
+      ],
+      'prk': [
+        [39.036051, 125.737647]
+      ]
+    };
+    
+    var countryCodeMap = {
+      'je': 'JSY',
+      'gg': 'GGY'
+    };
+
+    // setup structures for the "hits" (arcs)
+    // and circle booms
+
+    var hits = FixedQueue( 7, [  ] );
+    var boom = FixedQueue( 7, [  ] );
+
+    // we need random numbers and also a way to build random ip addresses
+    function getRandomInt(min, max) {return Math.floor(Math.random() * (max - min + 1)) + min;}
+    function getStroke() {return Math.round(Math.random()*100);}
+
+    // doing this a bit fancy for a hack, but it makes it
+    // easier to group code functions together and have variables
+    // out of global scope
+    function launchAttack(attacker, defender){
+      var self = this,
+      color;
+      
+      if (attacker == '#{user.tribe.code}') {
+        color = 'green';
+      } else {
+        color = 'red';
+      }
+      
+      var from = centers[attacker][Math.floor(Math.random()*centers[attacker].length)];
+      var to = centers[defender][Math.floor(Math.random()*centers[defender].length)];
+      
+      hits.push({ origin: { latitude: from[0], longitude: from[1] }, destination: { latitude: to[0], longitude: to[1] }});
+      map.arc(hits, { strokeWidth: 2, strokeColor: color });
+      boom.push({ radius: 7, latitude: to[0], longitude: to[1], fillOpacity: 0.5 });
+      map.bubbles(boom, { popupOnHover: false });
+    }
+    
+    var data = { 'je': 'Jersey', 'gg': 'Guernsey' };
+    map.labels({labelColor: 'white', fontSize: 12, customLabelText: data});
+
+    // lazy-dude's responsive window
+    d3.select(window).on('resize', function() { location.reload(); });
+    
+    var socket = io.connect('https://skyll-ovalbit.c9users.io');
+    
+    socket.on('greet', function (data) {
+      console.log('Connected');
+    });
+    
+    socket.on('launch', function(data) {
+      if (data.country != '#{user.tribe.code}') return;
+      
+      var countdown = 50;
+      var interval;
+      
+      vex.dialog.buttons.YES.text = 'Launch Defences';
+      vex.dialog.alert({
+        message: 'Missile launch detected, you have <span class="countdown">5</span>s to launch defences...',
+        afterOpen: function($vexContent) {
+          pendingLaunch = $vexContent.data().vex.id;
+          interval = setInterval(function() {
+            countdown--;
+            $vexContent.find('.countdown').text(Math.floor(countdown/10));
+            if (countdown <= 0) {
+              clearInterval(interval);
+              vex.close(pendingLaunch);
+            }
+          }, 100)
+        },
+        callback: function(){
+          socket.emit('defend', { id: data.id, timeleft: countdown, country: data.country, accuracy: data.accuracy });
+        }
+      });
+    });
+    
+    socket.on('self', function(data){
+      $('#stream').prepend('<p><span style="color:red">' + data.countryCode + ' → ' + data.countryCode + ' - <b>misfire</b></span>: ' + data.countryName + ' accidentally nuked themself</p>');
+      launchAttack(data.country, data.country);
+    });
+    
+    socket.on('pyongyang', function(data) {
+      $('#stream').prepend('<p><span style="color:red">PRK → ' + countryCodeMap[data.country] + ' - <b>attack by greatest korea</b></span>: ' + data.message + '</p>');
+      for (var i = 0; i < Math.random() * 7; i++){
+        launchAttack('prk', data.country);
+      }
+    });
+    
+    socket.on('defencesuccess', function(data) {
+      vex.close(pendingLaunch);
+      $('#stream').prepend('<p><span style="color:red">' + data.attacker + ' ✗ ' + data.casulty + ' - <b>strike failed</b></span>: ' + data.message + '</p>');
+    });
+    
+    socket.on('strike', function(data) {
+      vex.close(pendingLaunch);
+      $('#stream').prepend('<p><span style="color:red">' + data.attacker + ' → ' + data.casulty + ' - <b>strike successful</b></span>: ' + data.message + '</p>');
+      launchAttack(data.from, data.to);
+    });
+    
+    socket.on('stats', function(stats) {
+      $('.gg-stats').html('<strong>Guernsey</strong><br>Infrastructure: ' + stats.gg.infrastructure + '<br>Tourism: ' + stats.gg.tourism + '<br>Military Power: ' + stats.gg.military);
+      $('.je-stats').html('<strong>Jersey</strong><br>Infrastructure: ' + stats.je.infrastructure + '<br>Tourism: ' + stats.je.tourism + '<br>Military Power: ' + stats.je.military);
+    });
