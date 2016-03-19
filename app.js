@@ -220,6 +220,8 @@ var koreaMessage = [
   '{{country}} struck by retaliatory bolt of lightening',
 ]
 
+var pendingAttacks = {};
+
 io.on('connection', function(socket) {
   var user = socket.request.session.passport.user;
   
@@ -227,6 +229,9 @@ io.on('connection', function(socket) {
   
   socket.on('attack', function(data) {
     var attack = battleController.newAttack(data.country, user, data.accuracy);
+    
+    pendingAttacks[attack.id] = { data: data, time: new Date() };
+    
     if (attack.success) {
       io.emit('launch', { country: data.country, name: data.name, id: attack.id, accuracy: data.accuracy });
     } else {
@@ -245,6 +250,8 @@ io.on('connection', function(socket) {
   });
   
   socket.on('defend', function(data) {
+    delete pendingAttacks[data.id]; // Someone has responded so no longer pending
+    
     var success = battleController.defendAttack(data.id, data.timeleft, data.accuracy, user);
     battleController.updateStatus(data.id, success, user);
     
@@ -265,6 +272,21 @@ io.on('connection', function(socket) {
   setInterval(function(){
     var stats = battleController.getStats();
     io.emit('stats', stats);
+    
+    // Check if any pending attacks have expired
+    Object.keys(pendingAttacks).forEach(function(id) {
+      var now = new Date();
+      var attack = pendingAttacks[id];
+      
+      if (now - attack.time > 5000) {
+        // Attack has expired
+        var index = Math.floor(Math.random() * failMessage.length);
+        battleController.registerAttack(attack.data.id, attack.data.country, attack.data.accuracy, user);
+        io.emit('strike', { casulty: countryMap[attack.data.country], attacker: attackerMap[attack.data.country], message: failMessage[index], from: attackCodeMap[attack.data.country], to: attack.data.country });
+        
+        delete pendingAttacks[id];
+      }
+    })
   }, 1000)
 });
 
