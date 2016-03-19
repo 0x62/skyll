@@ -273,6 +273,15 @@ io.on('connection', function(socket) {
     var stats = battleController.getStats();
     io.emit('stats', stats);
     
+    // Check if anyone has lost
+    if (stats.je.infrastructure == 0 && stats.je.military == 0 && stats.je.tourism == 0) {
+      // Jersey loses
+      io.emit('loss', { country: 'je' });
+    } else if (stats.gg.infrastructure == 0 && stats.gg.military == 0 && stats.gg.tourism == 0) {
+      // Guernsey loses
+      io.emit('loss', { country: 'gg' });
+    }
+    
     // Check if any pending attacks have expired
     Object.keys(pendingAttacks).forEach(function(id) {
       var now = new Date();

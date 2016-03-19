@@ -44,6 +44,15 @@ setInterval(function(){
   // Base tourism on strike count
   if (xp.je.tourism > 0) xp.je.tourism -= xp.je.strikes/10; 
   if (xp.gg.tourism > 0) xp.gg.tourism -= xp.gg.strikes/10;
+  
+  if (xp.je.tourism < 10) xp.je.tourism += getRandMultiplier() * 2;
+  if (xp.gg.tourism < 10) xp.gg.tourism += getRandMultiplier() * 2;
+  
+  if (xp.je.tourism < 0) xp.je.tourism = 0; 
+  if (xp.gg.tourism < 0) xp.gg.tourism = 0;
+  
+  if (xp.je.tourism > 10) xp.je.tourism = 10; 
+  if (xp.gg.tourism > 10) xp.gg.tourism = 10;
     
   // Round everything
   xp.je.infrastructure = to2dp(xp.je.infrastructure);
@@ -133,8 +142,8 @@ exports.registerAttack = function(id, country, accuracy, user) {
   if (xp[country].infrastructure < 0) xp[country].infrastructure = 0;
   if (xp[country].military < 0) xp[country].military = 0;
   
-  console.log('Registered attack, updated stats:')
-  console.log(xp);
+  xp[country].infrastructure = to2dp(xp[country].infrastructure);
+  xp[country].military = to2dp(xp[country].military);
 }
 
 exports.getStats = function(){
