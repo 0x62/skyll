@@ -398,9 +398,9 @@ block content
     socket.on('loss', function(data) {
       if (data.country == '#{user.tribe.code}') {
         vex.dialog.buttons.YES.text = 'Try Again';
-        vox.alert('Oh dear, ' + countryNameMap[data.country] + ' has been destroyed..');
+        vex.alert('Oh dear, ' + countryNameMap[data.country] + ' has been destroyed..');
       } else {
         vex.dialog.buttons.YES.text = 'Play Again';
-        vox.alert('You\'ve destroyed '+ countryNameMap[data.country] + '. Are you happy now?');
+        vex.alert('You\'ve destroyed '+ countryNameMap[data.country] + '. Are you happy now?');
       }
     });

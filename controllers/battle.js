@@ -42,8 +42,8 @@ setInterval(function(){
   if (xp.gg.military > 10) xp.gg.military = 10;
   
   // Base tourism on strike count
-  xp.je.tourism = to2dp(10 - xp.je.strikes*Math.random()*2); 
-  xp.gg.tourism = to2dp(10 - xp.gg.strikes*Math.random()*2);
+  xp.je.tourism = to2dp(10 - xp.je.strikes); 
+  xp.gg.tourism = to2dp(10 - xp.gg.strikes);
   if (xp.je.tourism < 0) xp.je.tourism = 0; 
   if (xp.gg.tourism < 0) xp.gg.tourism = 0;
   
