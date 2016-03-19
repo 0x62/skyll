@@ -166,18 +166,45 @@ passport.use(new TwitterStrategy({
       if (existingUser) {
         return done(null, existingUser);
       }
-      var user = new User();
-      // Twitter will not provide an email address.  Period.
-      // But a person’s twitter username is guaranteed to be unique
-      // so we can "fake" a twitter email address as follows:
-      user.email = profile.username + "@twitter.com";
-      user.twitter = profile.id;
-      user.tokens.push({ kind: 'twitter', accessToken: accessToken, tokenSecret: tokenSecret });
-      user.profile.name = profile.displayName;
-      user.profile.location = profile._json.location;
-      user.profile.picture = profile._json.profile_image_url_https;
-      user.save(function(err) {
-        done(err, user);
+      // Decide if the user is Jersey/Guernsey
+      var address = req.header('x-forwarded-for') || req.connection.remoteAddress;
+      ip.satelize({ ip: address }, function(err, payload) {
+        if (err || !payload) {
+          return done('Unable to fetch your location. Please try again from a different computer.')
+        }
+        
+        var user = new User();
+        // Twitter will not provide an email address.  Period.
+        // But a person’s twitter username is guaranteed to be unique
+        // so we can "fake" a twitter email address as follows:
+        user.email = profile.username + "@twitter.com";
+        user.twitter = profile.id;
+        user.tokens.push({ kind: 'twitter', accessToken: accessToken, tokenSecret: tokenSecret });
+        user.profile.name = profile.displayName;
+        user.profile.location = profile._json.location;
+        user.profile.picture = profile._json.profile_image_url_https;
+        
+        if (payload.country_code == 'JE') {
+          user.tribe = {
+            name: 'jersey',
+            title: 'Jersey',
+            code: 'je'
+          }
+        } else if (payload.country_code == 'GG') {
+          user.tribe = {
+            name: 'guernsey',
+            title: 'Guernsey',
+            code: 'gg'
+          }
+        } else {
+          // Block user from signing up
+          return done('You must be in either Jersey or Guernsey to sign up. If you are using a VPN, please disable it and try again.')
+        }
+        
+        user.save(function(err) {
+          done(err, user);
+        });
+        
       });
     });
   }

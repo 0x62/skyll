@@ -88,26 +88,52 @@ exports.postSignup = function(req, res, next) {
     req.flash('errors', errors);
     return res.redirect('/signup');
   }
-
-  var user = new User({
-    email: req.body.email,
-    password: req.body.password
-  });
-
-  User.findOne({ email: req.body.email }, function(err, existingUser) {
-    if (existingUser) {
-      req.flash('errors', { msg: 'Account with that email address already exists.' });
+  
+  var address = req.header('x-forwarded-for') || req.connection.remoteAddress;
+  ip.satelize({ ip: address }, function(err, payload) {
+    if (err || !payload) {
+      req.flash('errors', { msg: 'Unable to fetch your location. Please try again from a different computer.' });
       return res.redirect('/signup');
     }
-    user.save(function(err) {
-      if (err) {
-        return next(err);
+
+    var user = new User({
+      email: req.body.email,
+      password: req.body.password
+    });
+  
+    if (payload.country_code == 'JE') {
+      user.tribe = {
+        name: 'jersey',
+        title: 'Jersey',
+        code: 'je'
       }
-      req.logIn(user, function(err) {
+    } else if (payload.country_code == 'GG') {
+      user.tribe = {
+        name: 'guernsey',
+        title: 'Guernsey',
+        code: 'gg'
+      }
+    } else {
+      // Block user from signing up
+     req.flash('errors', { msg: 'You must be in either Jersey or Guernsey to sign up. If you are using a VPN, please disable it and try again.' });
+     return res.redirect('/signup');
+    }
+    
+    User.findOne({ email: req.body.email }, function(err, existingUser) {
+      if (existingUser) {
+        req.flash('errors', { msg: 'Account with that email address already exists.' });
+        return res.redirect('/signup');
+      }
+      user.save(function(err) {
         if (err) {
           return next(err);
         }
-        res.redirect('/');
+        req.logIn(user, function(err) {
+          if (err) {
+            return next(err);
+          }
+          res.redirect('/');
+        });
       });
     });
   });
