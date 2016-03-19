@@ -42,14 +42,13 @@ setInterval(function(){
   if (xp.gg.military > 10) xp.gg.military = 10;
   
   // Base tourism on strike count
-  if (xp.je.tourism > 0) xp.je.tourism -= xp.je.strikes/10; 
-  if (xp.gg.tourism > 0) xp.gg.tourism -= xp.gg.strikes/10;
+  xp.je.tourism = xp.je.strikes/10; 
+  xp.gg.tourism = xp.gg.strikes/10;
+  if (xp.je.tourism < 0) xp.je.tourism = 0; 
+  if (xp.gg.tourism < 0) xp.gg.tourism = 0;
   
   if (xp.je.tourism < 10) xp.je.tourism += getRandMultiplier() * 2;
   if (xp.gg.tourism < 10) xp.gg.tourism += getRandMultiplier() * 2;
-  
-  if (xp.je.tourism < 0) xp.je.tourism = 0; 
-  if (xp.gg.tourism < 0) xp.gg.tourism = 0;
   
   if (xp.je.tourism > 10) xp.je.tourism = 10; 
   if (xp.gg.tourism > 10) xp.gg.tourism = 10;
@@ -135,7 +134,7 @@ exports.defendAttack = function(id, timeleft, accuracy, user) {
 exports.registerAttack = function(id, country, accuracy, user) {
   var attacker = (country == 'je' ? 'gg' : 'je');
   
-  console.log('infrastructure hit: %s', to2dp((accuracy/3000)*2*xp[attacker].military/4));
+  console.log('infrastructure hit: %s', to2dp(((accuracy/3000)*2*xp[attacker].military/4) / 4));
   
   xp[country].strikes += 1;
   xp[country].infrastructure -= to2dp((accuracy/3000)*2*xp[attacker].military/4);
