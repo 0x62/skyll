@@ -135,6 +135,8 @@ exports.defendAttack = function(id, timeleft, accuracy, user) {
 exports.registerAttack = function(id, country, accuracy, user) {
   var attacker = (country == 'je' ? 'gg' : 'je');
   
+  console.log('infrastructure hit: %s', to2dp((accuracy/3000)*2*xp[attacker].military/4));
+  
   xp[country].strikes += 1;
   xp[country].infrastructure -= to2dp((accuracy/3000)*2*xp[attacker].military/4);
   xp[country].military -= to2dp((accuracy/3000)*10);
