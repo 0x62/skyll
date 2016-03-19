@@ -101,26 +101,26 @@ exports.postSignup = function(req, res, next) {
       email: req.body.email,
       password: req.body.password,
     });
-  
-    if (payload.country_code == 'JE') {
-      user.tribe = {
-        name: 'jersey',
-        title: 'Jersey',
-        code: 'je'
-      }
-    } else if (payload.country_code == 'GG') {
-      user.tribe = {
-        name: 'guernsey',
-        title: 'Guernsey',
-        code: 'gg'
-      }
-    } else if (req.body.location == 'je') {
+    
+    if (req.body.location == 'je') {
       user.tribe = {
         name: 'jersey',
         title: 'Jersey',
         code: 'je'
       }
     } else if (req.body.location == 'gg') {
+      user.tribe = {
+        name: 'guernsey',
+        title: 'Guernsey',
+        code: 'gg'
+      }
+    } else if (payload.country_code == 'JE') {
+      user.tribe = {
+        name: 'jersey',
+        title: 'Jersey',
+        code: 'je'
+      }
+    } else if (payload.country_code == 'GG') {
       user.tribe = {
         name: 'guernsey',
         title: 'Guernsey',
