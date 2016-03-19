@@ -161,8 +161,8 @@ block content
           var jePos = je.offset();
           var skPos = sk.offset();
           
-          $('body').append('<div class="stats gg-stats" style="position: absolute; left: ' + ggPos.left + 'px; top: ' + (ggPos.top + ggHeight + 30) + 'px;"><strong>Guernsey</strong><br>Infrastructure: 8.5<br>Tourism: <span class="critical">2.3</span><br>Military Power: <span class="warning">4.8</span></div>');
-          $('body').append('<div class="stats je-stats" style="position: absolute; left: ' + jePos.left + 'px; top: ' + (jePos.top - 130) + 'px;"><strong>Jersey</strong><br>Infrastructure: 9.2<br>Tourism: 7.3<br>Military Power: <span class="warning">3.5</span></div>');
+          $('body').append('<div class="stats gg-stats" style="position: absolute; left: ' + ggPos.left + 'px; top: ' + (ggPos.top + ggHeight + 30) + 'px;"><strong>Guernsey</strong></div>');
+          $('body').append('<div class="stats je-stats" style="position: absolute; left: ' + jePos.left + 'px; top: ' + (jePos.top - 130) + 'px;"><strong>Jersey</strong></div>');
           $('body').append('<div class="stats sk-stats" style="position: absolute; left: ' + (skPos.left + 80) + 'px; top: ' + skPos.top + 'px;"><strong>Sark</strong></div>');
           
           
@@ -335,7 +335,7 @@ block content
     // lazy-dude's responsive window
     d3.select(window).on('resize', function() { location.reload(); });
     
-    var socket = io.connect('https://skyll-ovalbit.c9users.io');
+    var socket = io.connect('https://skyll.herokuapp.com');
     
     socket.on('greet', function (data) {
       console.log('Connected');
