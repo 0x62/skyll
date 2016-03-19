@@ -17,6 +17,15 @@ block content
         .col-sm-7
           input.form-control(type='password', name='confirmPassword', id='confirmPassword', placeholder='Confirm Password')
       .form-group
+        label.col-sm-3.control-label(for='location') Location
+        .col-sm-4
+          label.radio.col-sm-4
+            input(type='radio', name='location', value='je', data-toggle='radio', checked)
+            span Jersey
+          label.radio.col-sm-4
+            input(type='radio', name='location', value='gg', data-toggle='radio')
+            span Guernsey
+      .form-group
         .col-sm-offset-3.col-sm-7
           button.btn.btn-success(type='submit')
             i.fa.fa-user-plus
