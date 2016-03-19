@@ -15,11 +15,11 @@ $headings-font-family: 'Courier New', Courier, 'Lucida Sans Typewriter', 'Lucida
 // Buttons
 // -------------------------
 
-$btn-primary-border: darken($brand-primary, 3.2%);
-$btn-success-border: darken($brand-success, 3.2%);
-$btn-warning-border: darken($brand-warning, 3.2%);
-$btn-danger-border: darken($brand-danger, 3.2%);
-$btn-info-border: darken($brand-info, 3.2%);
+$btn-primary-border: #008000;
+$btn-success-border: #008000;
+$btn-warning-border: #008000;
+$btn-danger-border: #008000;
+$btn-info-border: #008000;
 
 // Forms
 // -------------------------
@@ -30,21 +30,21 @@ $input-border-focus: #2598f9;
 // Form states and alerts
 // -------------------------
 
-$state-success-text: #569845;
-$state-success-bg: #dbf5d3;
-$state-success-border: #aed3a5;
+$state-success-text: #008000;
+$state-success-bg: transparent;
+$state-success-border: #008000;
 
-$state-info-text: #3a87ad;
-$state-info-bg: #d9edf7;
-$state-info-border: #98cce7;
+$state-info-text: #008000;
+$state-info-bg: transparent;
+$state-info-border: #008000;
 
-$state-warning-text: #bf9853;
-$state-warning-bg: #fdf8e2;
-$state-warning-border: #f2daab;
+$state-warning-text: #008000;
+$state-warning-bg: transparent;
+$state-warning-border: #008000;
 
-$state-danger-text: #b94a48;
-$state-danger-bg: #f2dede;
-$state-danger-border: #e0b1b8;
+$state-danger-text: #008000;
+$state-danger-bg: transparent;
+$state-danger-border: #008000;
 
 
 // Navbar

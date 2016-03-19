@@ -27,14 +27,14 @@ $brand-danger:          #d9534f !default;
 //## Settings for some of the most global styles.
 
 //** Background color for `<body>`.
-$body-bg:               #fff !default;
+$body-bg:               #008000 !default;
 //** Global text color on `<body>`.
-$text-color:            $gray-dark !default;
+$text-color:            #008000 !default;
 
 //** Global textual link color.
-$link-color:            $brand-primary !default;
+$link-color:            #008000 !default;
 //** Link hover color set via `darken()` function.
-$link-hover-color:      darken($link-color, 15%) !default;
+$link-hover-color:      #008000 !default;
 //** Link hover decoration.
 $link-hover-decoration: underline !default;
 
@@ -149,31 +149,31 @@ $table-border-color:            #ddd !default;
 
 $btn-font-weight:                normal !default;
 
-$btn-default-color:              #333 !default;
-$btn-default-bg:                 #fff !default;
-$btn-default-border:             #ccc !default;
+$btn-default-color:              #008000 !default;
+$btn-default-bg:                 transparent !default;
+$btn-default-border:             #008000 !default;
 
-$btn-primary-color:              #fff !default;
-$btn-primary-bg:                 $brand-primary !default;
-$btn-primary-border:             darken($btn-primary-bg, 5%) !default;
+$btn-primary-color:              #008000 !default;
+$btn-primary-bg:                 transparent !default;
+$btn-primary-border:             #008000 !default;
 
-$btn-success-color:              #fff !default;
-$btn-success-bg:                 $brand-success !default;
-$btn-success-border:             darken($btn-success-bg, 5%) !default;
+$btn-success-color:              #008000 !default;
+$btn-success-bg:                 transparent !default;
+$btn-success-border:             #008000 !default;
 
-$btn-info-color:                 #fff !default;
-$btn-info-bg:                    $brand-info !default;
-$btn-info-border:                darken($btn-info-bg, 5%) !default;
+$btn-info-color:                 #008000 !default;
+$btn-info-bg:                    transparent !default;
+$btn-info-border:                #008000 !default;
 
-$btn-warning-color:              #fff !default;
-$btn-warning-bg:                 $brand-warning !default;
-$btn-warning-border:             darken($btn-warning-bg, 5%) !default;
+$btn-warning-color:              #008000 !default;
+$btn-warning-bg:                 transparent !default;
+$btn-warning-border:             #008000 !default;
 
-$btn-danger-color:               #fff !default;
-$btn-danger-bg:                  $brand-danger !default;
-$btn-danger-border:              darken($btn-danger-bg, 5%) !default;
+$btn-danger-color:               #008000 !default;
+$btn-danger-bg:                  transparent !default;
+$btn-danger-border:              #008000 !default;
 
-$btn-link-disabled-color:        $gray-light !default;
+$btn-link-disabled-color:        #008000 !default;
 
 // Allows for customizing button radius independently from global border radius
 $btn-border-radius-base:         $border-radius-base !default;
@@ -186,14 +186,14 @@ $btn-border-radius-small:        $border-radius-small !default;
 //##
 
 //** `<input>` background color
-$input-bg:                       #fff !default;
+$input-bg:                       transparent !default;
 //** `<input disabled>` background color
 $input-bg-disabled:              $gray-lighter !default;
 
 //** Text color for `<input>`s
-$input-color:                    $gray !default;
+$input-color:                    #008000 !default;
 //** `<input>` border color
-$input-border:                   #ccc !default;
+$input-border:                   #008000 !default;
 
 // TODO: Rename `$input-border-radius` to `$input-border-radius-base` in v4
 //** Default `.form-control` border radius
@@ -205,7 +205,7 @@ $input-border-radius-large:      $border-radius-large !default;
 $input-border-radius-small:      $border-radius-small !default;
 
 //** Border color for inputs on focus
-$input-border-focus:             #66afe9 !default;
+$input-border-focus:             #008000 !default;
 
 //** Placeholder text color
 $input-color-placeholder:        #999 !default;

@@ -124,7 +124,6 @@
 }
 /* line 16, ../sass/vex-theme-wireframe.sass */
 .vex.vex-theme-wireframe .vex-content {
-  font-family: "Helvetica Neue", sans-serif;
   background: black;
   color: green;
   border: 2px solid green;
@@ -133,8 +132,8 @@
   margin: 0 auto;
   max-width: 100%;
   width: 600px;
-  font-size: 1.1em;
-  line-height: 1.5em;
+  font-size: 1em;
+  line-height: 1.4em;
 }
 
 .vex.vex-theme-wireframe .vex-content .vex-dialog-message {
