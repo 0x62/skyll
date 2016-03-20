@@ -65,10 +65,10 @@ setInterval(function(){
 }, 2000);
 
 setInterval(function(){
-  // Reset strike count every minute
-  xp.je.strikes = 0;
-  xp.gg.strikes = 0;
-}, 60000)
+  // Rebuild strike once every 20 seconds
+  xp.je.strikes -= 1;
+  xp.gg.strikes -= 1;
+}, 20000)
 
 /**
  * GET /battle
@@ -134,10 +134,8 @@ exports.defendAttack = function(id, timeleft, accuracy, user) {
 exports.registerAttack = function(id, country, accuracy, user) {
   var attacker = (country == 'je' ? 'gg' : 'je');
   
-  console.log('infrastructure hit: %s', to2dp(((accuracy/3000)*2*xp[attacker].military/4) / 4));
-  
   xp[country].strikes += 1;
-  xp[country].infrastructure -= to2dp((accuracy/3000)*xp[attacker].military/4);
+  xp[country].infrastructure -= to2dp(((accuracy/3000)*2*xp[attacker].military/4) / 4);
   xp[country].military -= to2dp((accuracy/3000)*2*Math.random());
   
   if (xp[country].infrastructure < 0) xp[country].infrastructure = 0;
