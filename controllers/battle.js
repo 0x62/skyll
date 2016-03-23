@@ -47,8 +47,8 @@ setInterval(function(){
   if (xp.je.tourism < 0) xp.je.tourism = 0; 
   if (xp.gg.tourism < 0) xp.gg.tourism = 0;
   
-  if (xp.je.tourism < 10) xp.je.tourism += getRandMultiplier() * 2;
-  if (xp.gg.tourism < 10) xp.gg.tourism += getRandMultiplier() * 2;
+  if (xp.je.tourism < 10) xp.je.tourism += getRandMultiplier();
+  if (xp.gg.tourism < 10) xp.gg.tourism += getRandMultiplier();
   
   if (xp.je.tourism > 10) xp.je.tourism = 10; 
   if (xp.gg.tourism > 10) xp.gg.tourism = 10;
@@ -66,8 +66,8 @@ setInterval(function(){
 
 setInterval(function(){
   // Rebuild strike once every 20 seconds
-  xp.je.strikes -= 1;
-  xp.gg.strikes -= 1;
+  if (xp.je.strikes > 0) xp.je.strikes -= 1;
+  if (xp.gg.strikes > 0) xp.gg.strikes -= 1;
 }, 20000)
 
 /**
